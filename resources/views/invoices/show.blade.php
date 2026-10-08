@@ -13,14 +13,23 @@
         </a>
 
         <div class="flex items-center flex-wrap gap-2.5">
-            <!-- Print Button -->
-            <button onclick="window.print()" 
-                    class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-black text-white font-extrabold px-4.5 py-2.5 rounded-xl text-xs shadow-xs transition-all border border-zinc-900">
+            <!-- Download PDF Button -->
+            <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank" 
+               class="inline-flex items-center space-x-2 bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold px-4 py-2.5 rounded-xl text-xs shadow-xs transition-all border border-emerald-700">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>Download PDF</span>
+            </a>
+
+            <!-- Cetak / Print PDF Button (Full Complete Document) -->
+            <a href="{{ route('invoices.pdf', $invoice) }}" target="_blank" 
+               class="inline-flex items-center space-x-2 bg-zinc-950 hover:bg-black text-white font-extrabold px-4.5 py-2.5 rounded-xl text-xs shadow-xs transition-all border border-zinc-900">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
                 </svg>
-                <span>Print Invoice</span>
-            </button>
+                <span>Cetak / Print PDF Invoice</span>
+            </a>
 
             <!-- Edit -->
             <a href="{{ route('invoices.edit', $invoice) }}" 
@@ -46,7 +55,14 @@
     </div>
 
     <!-- Printable Invoice Document Card -->
-    <div class="bg-white rounded-3xl p-8 md:p-12 border border-zinc-200/90 shadow-lg print-shadow-none print-p-0 space-y-8 text-zinc-900">
+    <div class="printable-card relative overflow-hidden print:overflow-visible bg-white rounded-3xl p-8 md:p-12 border border-zinc-200/90 shadow-lg print-shadow-none print-p-0 space-y-8 text-zinc-900">
+        
+        <!-- Transparent PNG Watermark Stamp (Lunas.png / BelumLunas.png / JatuhTempo.png) -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden z-10 p-2" aria-hidden="true">
+            <img src="{{ asset('images/stamps/' . $invoice->stamp_image) }}" 
+                 alt="Stempel {{ $invoice->status_label }}" 
+                 class="w-[96%] sm:w-[92%] max-w-[780px] h-auto object-contain opacity-[0.45] print:opacity-[0.45] transition-all">
+        </div>
         
         <!-- Header: Logo & Business Info + Invoice Title -->
         <div class="flex flex-col sm:flex-row justify-between items-start border-b border-zinc-200 pb-8 gap-6">
@@ -169,13 +185,25 @@
             </div>
         </div>
 
-        <!-- Notes Footer -->
-        @if($invoice->notes)
-            <div class="border-t border-zinc-200 pt-6">
-                <span class="block text-[11px] font-extrabold uppercase tracking-wider text-zinc-400 mb-1">Catatan / Terms & Conditions:</span>
-                <p class="text-xs text-zinc-600 whitespace-pre-line leading-relaxed">{{ $invoice->notes }}</p>
+        <!-- Notes & Vendor Stamp Footer -->
+        <div class="flex flex-col sm:flex-row justify-between items-end border-t border-zinc-200 pt-6 gap-6">
+            <div class="flex-1">
+                @if($invoice->notes)
+                    <span class="block text-[11px] font-extrabold uppercase tracking-wider text-zinc-400 mb-1">Catatan / Terms & Conditions:</span>
+                    <p class="text-xs text-zinc-600 whitespace-pre-line leading-relaxed">{{ $invoice->notes }}</p>
+                @endif
             </div>
-        @endif
+
+            @if(!empty($settings['stamp']) && \Illuminate\Support\Facades\Storage::disk('public')->exists($settings['stamp']))
+                <div class="text-center sm:text-right shrink-0">
+                    <span class="block text-[10px] font-extrabold uppercase tracking-wider text-zinc-400 mb-1">Hormat Kami,</span>
+                    <div class="h-20 max-h-24 w-auto flex items-center justify-center sm:justify-end my-1">
+                        <img src="{{ asset('storage/' . $settings['stamp']) }}" alt="Stempel Vendor" class="h-full max-h-24 w-auto object-contain">
+                    </div>
+                    <span class="block text-xs font-bold text-zinc-950 mt-1">{{ $settings['business_name'] ?? '' }}</span>
+                </div>
+            @endif
+        </div>
 
     </div>
 

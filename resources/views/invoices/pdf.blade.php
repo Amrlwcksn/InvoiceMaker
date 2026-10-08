@@ -125,9 +125,31 @@
             padding-top: 12px;
             border-top: 1px solid #e4e4e7;
         }
+
+        .watermark-container {
+            position: fixed;
+            top: 16%;
+            left: 2%;
+            width: 96%;
+            text-align: center;
+            z-index: 1000;
+        }
+        .watermark-img {
+            width: 94%;
+            max-width: 680px;
+            height: auto;
+            opacity: 0.45;
+        }
     </style>
 </head>
 <body>
+
+    @if(!empty($stampBase64))
+        <!-- Transparent PNG Watermark Stamp (45% Opacity) -->
+        <div class="watermark-container">
+            <img src="{{ $stampBase64 }}" class="watermark-img">
+        </div>
+    @endif
 
     <!-- Header Table -->
     <table class="header-table">
@@ -248,13 +270,24 @@
         </tr>
     </table>
 
-    <!-- Notes Section -->
-    @if($invoice->notes)
-        <div class="notes-section">
-            <div class="meta-title">Catatan / Terms & Conditions:</div>
-            <div style="color: #3f3f46; margin-top: 4px; white-space: pre-line;">{{ $invoice->notes }}</div>
-        </div>
-    @endif
+    <!-- Footer Section with Notes & Vendor Stamp -->
+    <table style="width: 100%; margin-top: 25px; border-top: 1px solid #e4e4e7; padding-top: 12px;">
+        <tr>
+            <td style="width: 60%; vertical-align: top;">
+                @if($invoice->notes)
+                    <div class="meta-title">Catatan / Terms & Conditions:</div>
+                    <div style="color: #3f3f46; margin-top: 4px; white-space: pre-line;">{{ $invoice->notes }}</div>
+                @endif
+            </td>
+            <td style="width: 40%; vertical-align: top; text-align: right;">
+                @if(!empty($vendorStampBase64))
+                    <div class="meta-title" style="margin-bottom: 4px;">Hormat Kami,</div>
+                    <img src="{{ $vendorStampBase64 }}" style="max-height: 100px; max-width: 220px; margin-top: 2px; margin-bottom: 2px;">
+                    <div style="font-weight: bold; color: #09090b; font-size: 9px;">{{ $settings['business_name'] ?? '' }}</div>
+                @endif
+            </td>
+        </tr>
+    </table>
 
 </body>
 </html>

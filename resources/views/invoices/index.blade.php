@@ -5,6 +5,41 @@
 
 @section('content')
 <div class="space-y-6">
+
+    <!-- Rekap Omset & Laporan Invoices Bar -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="bg-white p-4 rounded-3xl border border-zinc-200/90 shadow-xs flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-zinc-400">Total Transaksi</span>
+                <p class="text-xl font-black text-zinc-950 mt-0.5">{{ number_format($stats['total_invoices']) }} Invoice</p>
+            </div>
+            <div class="w-9 h-9 rounded-2xl bg-zinc-100 text-zinc-800 flex items-center justify-center font-bold text-xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl border border-zinc-200/90 shadow-xs flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-emerald-600">Rekap Omset Lunas</span>
+                <p class="text-lg font-black text-emerald-950 mt-0.5">Rp {{ number_format($stats['total_revenue'], 0, ',', '.') }}</p>
+            </div>
+            <div class="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold text-xs border border-emerald-200">
+                ✓
+            </div>
+        </div>
+
+        <div class="bg-white p-4 rounded-3xl border border-zinc-200/90 shadow-xs flex items-center justify-between">
+            <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-rose-600">Belum Lunas</span>
+                <p class="text-lg font-black text-rose-950 mt-0.5">Rp {{ number_format($stats['unpaid_revenue'], 0, ',', '.') }}</p>
+            </div>
+            <div class="w-9 h-9 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center font-bold text-xs border border-rose-200">
+                !
+            </div>
+        </div>
+    </div>
     
     <!-- Status Filter Tabs & Create Action -->
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 bg-white p-5 rounded-3xl border border-zinc-200/90 shadow-xs">
@@ -36,11 +71,32 @@
             </a>
         </div>
 
-        <div class="flex items-center space-x-3">
-            <!-- Search Form -->
-            <form action="{{ route('invoices.index') }}" method="GET" class="flex-1 min-w-[240px]">
+        <div class="flex flex-wrap items-center gap-3">
+            <!-- Period Month Filter -->
+            <form action="{{ route('invoices.index') }}" method="GET" class="flex items-center">
                 @if(request('status'))
                     <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
+                @if(request('search'))
+                    <input type="hidden" name="search" value="{{ request('search') }}">
+                @endif
+                <select name="month_year" onchange="this.form.submit()" class="bg-zinc-50 border border-zinc-200 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 focus:outline-none focus:ring-2 focus:ring-zinc-950 cursor-pointer">
+                    <option value="">Semua Periode</option>
+                    @foreach($availableMonths as $m)
+                        <option value="{{ $m['key'] }}" {{ request('month_year') === $m['key'] ? 'selected' : '' }}>
+                            {{ $m['label'] }}
+                        </option>
+                    @endforeach
+                </select>
+            </form>
+
+            <!-- Search Form -->
+            <form action="{{ route('invoices.index') }}" method="GET" class="flex-1 min-w-[200px]">
+                @if(request('status'))
+                    <input type="hidden" name="status" value="{{ request('status') }}">
+                @endif
+                @if(request('month_year'))
+                    <input type="hidden" name="month_year" value="{{ request('month_year') }}">
                 @endif
                 <div class="relative">
                     <input type="text" 
@@ -54,12 +110,22 @@
                 </div>
             </form>
 
+            <!-- Export Sheets Button -->
+            <a href="{{ route('invoices.export', request()->all()) }}" 
+               title="Export data transaksi ke format CSV / Sheets"
+               class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-emerald-600 via-emerald-700 to-emerald-800 hover:from-emerald-700 hover:to-emerald-900 text-white font-black px-4 py-2 rounded-xl text-xs shadow-md border border-emerald-500 hover:scale-[1.02] transition-all shrink-0">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                </svg>
+                <span>Export Sheets</span>
+            </a>
+
             <a href="{{ route('invoices.create') }}" 
                class="inline-flex items-center justify-center space-x-2 bg-zinc-950 hover:bg-black text-white font-bold px-4 py-2 rounded-xl text-xs shadow-xs transition-all shrink-0 border border-zinc-900">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/>
                 </svg>
-                <span>+ Buat Invoice</span>
+                <span>Buat Invoice</span>
             </a>
         </div>
     </div>

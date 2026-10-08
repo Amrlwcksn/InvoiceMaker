@@ -85,6 +85,58 @@ class Invoice extends Model
         };
     }
 
+    public function getStampImageAttribute(): string
+    {
+        return match ($this->status) {
+            'paid' => 'Lunas.png',
+            'unpaid' => 'BelumLunas.png',
+            'draft' => 'BelumLunas.png',
+            'overdue' => 'JatuhTempo.png',
+            default => 'BelumLunas.png',
+        };
+    }
+
+    public function getStampDetailsAttribute(): array
+    {
+        return match ($this->status) {
+            'paid' => [
+                'text' => 'LUNAS',
+                'text_class' => 'text-rose-500',
+                'border_class' => 'border-rose-400',
+                'hex' => '#ef4444',
+                'hex_border' => '#f87171',
+            ],
+            'unpaid' => [
+                'text' => 'BELUM LUNAS',
+                'text_class' => 'text-rose-500',
+                'border_class' => 'border-rose-400',
+                'hex' => '#ef4444',
+                'hex_border' => '#f87171',
+            ],
+            'draft' => [
+                'text' => 'DRAFT',
+                'text_class' => 'text-amber-500',
+                'border_class' => 'border-amber-400',
+                'hex' => '#f59e0b',
+                'hex_border' => '#fbbf24',
+            ],
+            'overdue' => [
+                'text' => 'JATUH TEMPO',
+                'text_class' => 'text-rose-700',
+                'border_class' => 'border-rose-600',
+                'hex' => '#be123c',
+                'hex_border' => '#e11d48',
+            ],
+            default => [
+                'text' => strtoupper((string)$this->status),
+                'text_class' => 'text-zinc-500',
+                'border_class' => 'border-zinc-400',
+                'hex' => '#71717a',
+                'hex_border' => '#a1a1aa',
+            ],
+        };
+    }
+
     /**
      * Generate sequential invoice number (e.g. INV-2026-001)
      */

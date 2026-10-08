@@ -3,14 +3,37 @@
 @layer utilities {
     /* Print CSS rules */
     @media print {
-        body {
-            background: white !important;
-            color: black !important;
-            font-size: 12pt;
+        *, ::before, ::after {
+            background-color: transparent !important;
+            box-shadow: none !important;
+            text-shadow: none !important;
         }
 
-        .no-print {
+        html, body {
+            background: white !important;
+            color: #000000 !important;
+            height: auto !important;
+            min-height: auto !important;
+            overflow: visible !important;
+            width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            font-size: 10pt;
+        }
+
+        /* Hide interactive non-printable elements */
+        .no-print, header.no-print, aside.no-print, nav, button, form.no-print {
             display: none !important;
+        }
+
+        /* Unroll scrollable containers for full multi-page printing */
+        main, .flex-1, div, section, article {
+            overflow: visible !important;
+            height: auto !important;
+            max-height: none !important;
+            min-height: 0 !important;
+            margin: 0 !important;
+            box-shadow: none !important;
         }
 
         .print-only {
@@ -22,14 +45,28 @@
             border: none !important;
         }
 
-        .print-p-0 {
+        /* Printable Invoice Card Reset */
+        .printable-card {
             padding: 0 !important;
             margin: 0 !important;
+            border: none !important;
+            width: 100% !important;
+            box-shadow: none !important;
+            position: relative !important;
+        }
+
+        /* Prevent breaking inside tables and totals */
+        table, tr, td, th, blockquote {
+            page-break-inside: avoid !important;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            page-break-after: avoid !important;
         }
 
         @page {
             size: A4 portrait;
-            margin: 15mm;
+            margin: 12mm 15mm;
         }
     }
 }

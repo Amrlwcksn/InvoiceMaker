@@ -123,7 +123,7 @@
                 <h1 class="text-base font-black text-zinc-950 tracking-tight">@yield('page_title', 'Dashboard')</h1>
             </div>
             
-            <div class="flex items-center space-x-3">
+            <!-- <div class="flex items-center space-x-3">
                 <a href="{{ route('invoices.create') }}" 
                    class="inline-flex items-center justify-center space-x-2 bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 hover:scale-[1.02] text-white font-bold px-4.5 py-2.5 rounded-2xl text-xs shadow-sm transition-all border border-zinc-800">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -131,7 +131,7 @@
                     </svg>
                     <span>Buat Invoice</span>
                 </a>
-            </div>
+            </div> -->
         </header>
 
         <!-- Main Body -->
